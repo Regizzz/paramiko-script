@@ -10,20 +10,21 @@ password = getpass("Enter password: ")
 
 session = paramiko.SSHClient()
 
-# session.set_missing_host_key_policy(paramiko.AutoAddPolicy())
 session.load_system_host_keys()
 
 session.connect(hostname=host,
                 username=username,
                 password=password)
 
-# vpnclient = input("Enter vpn client name: ")
-# './easyrsa gen-req {vpnclient} nopass'.format(vpnclient)
-commands = ['cd easy-rsa', 'ls -l']
+vpnclient = input("Enter vpn client name: ")
+
+commands = [f'cd easy-rsa && yes "" | ./easyrsa gen-req {vpnclient} nopass', 
+            f'cp /home/miguel/easy-rsa/pki/private/{vpnclient}.key ~/client-configs/keys', 
+            'ls ~/client-configs/keys']
 
 for command in commands:
     stdin, stdout, stderr = session.exec_command(command)
-    time.sleep(.5)
+    time.sleep(1)
     print(stdout.read().decode())
 
 session.close()
